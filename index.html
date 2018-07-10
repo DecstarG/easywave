@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Waveform Generator</title>
+	<style type="text/css">
+		.scrubBar {
+			opacity: 0.7;
+			background: #d3d3d3;
+			width: 90%;
+		}
+
+		.scrubBar:hover {
+			opacity: 1;
+		}
+
+		.scrubBar::-webkit-scrubBar-thumb {
+    		-webkit-appearance: none; /* Override default look */
+    		appearance: none;
+    		width: 15px; /* Set a specific scrubBar handle width */
+    		height: 15px; /* scrubBar handle height */
+    		background: #A8A8A8; /* Green background */
+   			cursor: pointer; /* Cursor on hover */
+		}
+
+		.scrubBar::-moz-range-thumb {
+    		width: 15px; /* Set a specific scrubBar handle width */
+    		height: 15px; /* scrubBar handle height */
+   			background: #A8A8A8; /* Green background */
+    		cursor: pointer; /* Cursor on hover */
+		}
+	</style>
+</head>
+<body>
+
+<!--Script-->
+<script src="wavesurfer.js"></script>
+
+<!--Waveform Div-->
+<div id="waveform"></div>
+
+<!--Scrub bar-->
+<div id="extra_controls">
+<button id="pausePlay" onclick="wavesurfer.playPause()"><img id="pauseImg" width="25"></button><input onchange="checkunlock()" onmouseover="timechanger()" type="range" min="0" max="100" value="1" class="scrubBar" id="scrubBar">
+</div>
+
+<!--Script-->
+<script>
+
+	var scrubBar = document.getElementById("scrubBar");
+	var pauseButton = document.getElementById("pausePlay");
+	var pauseImg = document.getElementById("pauseImg");
+
+	var unlocked = false; //Unlocked var
+
+	//Create Wavesurfer instance
+	var wavesurfer = WaveSurfer.create({
+    	container: '#waveform',
+    	waveColor: 'violet',
+    	progressColor: 'purple'
+	});
+
+	//Load song
+	wavesurfer.load('music.mp3');
+
+	//Allow time change
+	function timechanger() {
+		unlocked = true;
+	}
+
+	//Check if the bar is unlocked, and if so move it
+	function checkunlock() {
+		var percent = scrubBar.value / 100; //Gets percent
+
+		if (unlocked) {
+			wavesurfer.seekTo(percent);
+		}
+
+	}
+
+
+	//Get time, sets bar and sets button in loop
+	window.setInterval(function() {
+
+		var time = wavesurfer.getCurrentTime(); //Gets time
+		var duration = wavesurfer.getDuration(); //Gets duration
+
+		var percent = (time / duration) * 100; //Gets percent done
+
+		scrubBar.value = percent; //Sets scrub bar
+
+		if (wavesurfer.isPlaying()) {
+			pauseImg.src = "pause.png"; //Sets button to pause image
+		}
+		else {
+			pauseImg.src = "play.png"; //Sets button to play image
+		}
+
+	}, 50)
+</script>
+
+</body>
+</html>
